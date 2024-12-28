@@ -1,0 +1,112 @@
+const baseUrl = "https://your-glitch-json-server.glitch.me/books";
+document.addEventListener("DOMContentLoaded", () => 
+{
+    const loginData = JSON.parse(localStorage.getItem("loginData"));
+    if (!loginData || loginData.email !== "admin@empher.com")
+    {
+        alert("Admin Not Logged In.");
+window.location.href="index.html";
+return;
+}
+const bookGrid = document.getElementById("bookGrid");
+const fetchBooks = async () => 
+{
+    const response = await fetch(baseUrl);
+    const books = await response.json();
+    renderBooks(books);
+};
+const renderBooks = (books) =>
+{
+    bookGrid.innerHTML ="";
+    books.forEach((book) => 
+    {
+        const bookCard =
+        document.createElement("div");
+        bookCard.innerHTML = `
+        <h3>${book.title}</h3>
+        <p>${book.author}</p>
+        <p>${book.category}</p>
+        <p>Status: $ {book.isAvailable ? "Available" : "Borrowed"}</p>
+        <button $ {book.isVerified ? "disabled" : ""} onclick="verifyBook(${book.id})"Verify Book</button>
+        <button onclick="deleteBook(${book.id})">Delete Book</button>`;
+        bookGrid.appendChild(bookCard);
+    });
+};
+
+document.getElementById("addBookForm").addEventListener("submit"),async (event) =>
+     {
+        event.preventDefault();
+        const title = document.getElementById("title").Value;
+        const author = document.getElementById("author").Value;
+        const category = document.getElementById("category").Value;
+
+        await fetch(baseUrl, {
+            method: "POST", headres: { "Content-Type":"application/json" },
+            body: JSON.stringify({
+                title,
+                author,
+                category,
+                isAvailable: true,
+                isVerified: false,
+                borrowedDays: null,
+                imageUrl:"https://m.media-amazon.com/images/I/71ZB18P3inL._SY522_.jpg",
+            }),
+          });
+          alert("Bokk Added Successfully");
+          fetchBooks();
+        });
+        window.verifyBook = async (id) => {
+const confirm("Are you sure to Verify?");
+if (confirm) {
+    await fetch(`${baseUrl}/${id}`,
+        {
+            method: "PATCH",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ isVerified: true }),
+        });
+        alert("Book Verified Successfully");
+        fetchBooks();
+        }
+        };
+        window.deleteBook = async (id) => {
+            const confirm = window.confirm("Are you sure to Delete?");
+            if (confirm) {
+                await fetch(`${baseUrl}/${id}`, {method: "Delete"});
+                alert("Book Deleted Successfully");
+                fetchBooks();
+            }
+        };
+        fetchBooks();
+        });
+   
+    
+
+html:code
+<html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport"
+            content="width=device-width,initial-scale=1.0">
+            <title>Admin - Book Management App</title>
+        </head>
+        <body>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="admin.html">Admin</a>
+                <a href="books.html">Books</a>
+            </nav>
+            <h1>Admin Panel</h1>
+            <form id="addBookForm">
+                <input type="text" id="title" placeholder="Book Title" required/>
+                <input type="text" id="author" placeholder="Author Name" required/>
+               <select id="category">
+                <option value="Fiction">Fiction</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Technical">Technical</option>
+               </select>
+               <button type="submit">Add Book</button>
+            </form>
+            <div id="bookGrid"></div>
+    <script src="js/admin.js"></script>
+        </body>
+</html>
